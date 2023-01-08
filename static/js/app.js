@@ -2,14 +2,9 @@
 
 const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
 
-// Promise Pending
-const dataPromise = d3.json(url);
-console.log("Data Promise: ", dataPromise);
-
-// Fetch the JSON data and console log it
-
 // fetch JSON data has to be done together with plot 
-// Graph BAR
+// 2. Create a horizontal bar chart with a dropdown menu to display the top 10 OTUs found in that individual.
+
 function GraphBar(sampleID) {
     d3.json(url).then(function(data) {
     console.log(data)
@@ -44,7 +39,7 @@ function GraphBar(sampleID) {
 });
 };
 
-// Graph Bubble chart
+// 3.Create a bubble chart that displays each sample.
 function GraphBubble(sampleID) {
     console.log(`Generate bubble chart for ${sampleID}`);
 
@@ -85,8 +80,9 @@ function GraphBubble(sampleID) {
     });
 };
 
+// 4. Display the sample metadata, i.e., an individual's demographic information.
+// 5. Display each key-value pair from the metadata JSON object somewhere on the page.
 
-// Metadata
 function DisplayMetadata(sampleID) {
     console.log(`Display sample metadata for ${sampleID}`);
 
@@ -97,21 +93,22 @@ function DisplayMetadata(sampleID) {
         let result = metadata.filter(meta => meta.id == sampleID)[0];
         let demog = d3.select('.panel-body');
 
+        // clear drop down panel
         demog.html('');
 
+        // add corresponding key and value
         Object.entries(result).forEach(([key,value]) => {
             demog.append('h6').text(`${key}: ${value}`);
         });
     });
 };
 
-
+// 6. Update all the plots when a new sample is selected. Additionally, you are welcome to create any layout that you would like for your dashboard.
 function optionChanged(sampleID) {
     console.log(`ID has changed to: ${sampleID}`);
 
     GraphBar(sampleID);
     GraphBubble(sampleID);
-    // DrawGauge(sampleID);
     DisplayMetadata(sampleID);
 }
 
