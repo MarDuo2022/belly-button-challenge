@@ -43,3 +43,40 @@ d3.json(url).then(function(data) {
 });
 
 // Graph Bubble chart
+console.log(`Generate bubble chart for 940`);
+
+d3.json(url).then(data => {
+    let samples = data.samples;
+    let resultArray = samples.filter(sample => sample.id == 940);
+    let result = resultArray[0];
+
+    let otu_ids = result.otu_ids;
+    let otu_labels = result.otu_labels;
+    let sample_values = result.sample_values;
+
+    // Compile bubble data trace for chart
+    let bubbleData = {
+        x: otu_ids,
+        y: sample_values,
+        text: otu_labels,
+        mode: 'markers',
+        marker: {
+            size: sample_values,
+            color: otu_ids,
+            colorscale: 'Rainbow'
+        }
+    }
+
+    // Put the trace into an array
+    let bubbleArray = [bubbleData];
+
+    // Create a layout object
+    let bubbleLayout = {
+        title: 'Bacteria Cultures Per Sample',
+        margin: {t: 100},
+        xaxis: {title: "OTU ID"},
+    };
+
+    // Call Plotly funtion
+    Plotly.newPlot('bubble', bubbleArray, bubbleLayout);
+});
