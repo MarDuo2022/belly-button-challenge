@@ -9,6 +9,7 @@ console.log("Data Promise: ", dataPromise);
 // Fetch the JSON data and console log it
 
 // fetch JSON data has to be done together with plot 
+// Graph BAR
 d3.json(url).then(function(data) {
     console.log(data)
 
@@ -40,3 +41,5 @@ d3.json(url).then(function(data) {
 
     Plotly.newPlot('bar', barArray, barLayout)
 });
+
+// Graph Bubble chart
