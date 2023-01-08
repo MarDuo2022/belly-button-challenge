@@ -10,11 +10,12 @@ console.log("Data Promise: ", dataPromise);
 
 // fetch JSON data has to be done together with plot 
 // Graph BAR
+GraphBar(sampleID) {
 d3.json(url).then(function(data) {
     console.log(data)
 
     let samples = data.samples;
-    let samplesPropertiesArray = samples.filter(sample => sample.id == 940);
+    let samplesPropertiesArray = samples.filter(sample => sample.id == sampleID);
     let samplesProperties = samplesPropertiesArray[0];
 
     let otu_ids = samplesProperties.otu_ids;
@@ -41,61 +42,110 @@ d3.json(url).then(function(data) {
 
     Plotly.newPlot('bar', barArray, barLayout)
 });
+};
 
 // Graph Bubble chart
-console.log(`Generate bubble chart for 940`);
+function GraphBubble(sampleId) {
+    console.log(`Generate bubble chart for ${sampleId}`);
 
-d3.json(url).then(data => {
-    let samples = data.samples;
-    let resultArray = samples.filter(sample => sample.id == 940);
-    let result = resultArray[0];
+    d3.json(url).then(data => {
+        let samples = data.samples;
+        let resultArray = samples.filter(sample => sample.id == sampleId);
+        let result = resultArray[0];
 
-    let otu_ids = result.otu_ids;
-    let otu_labels = result.otu_labels;
-    let sample_values = result.sample_values;
+        let otu_ids = result.otu_ids;
+        let otu_labels = result.otu_labels;
+        let sample_values = result.sample_values;
 
-    // Compile bubble data trace for chart
-    let bubbleData = {
-        x: otu_ids,
-        y: sample_values,
-        text: otu_labels,
-        mode: 'markers',
-        marker: {
-            size: sample_values,
-            color: otu_ids,
-            colorscale: 'Rainbow'
+        // Compile bubble data trace for chart
+        let bubbleData = {
+            x: otu_ids,
+            y: sample_values,
+            text: otu_labels,
+            mode: 'markers',
+            marker: {
+                size: sample_values,
+                color: otu_ids,
+                colorscale: 'Rainbow'
+            }
         }
-    }
 
-    // Put the trace into an array
-    let bubbleArray = [bubbleData];
+        // Put the trace into an array
+        let bubbleArray = [bubbleData];
 
-    // Create a layout object
-    let bubbleLayout = {
-        title: 'Bacteria Cultures Per Sample',
-        margin: {t: 100},
-        xaxis: {title: "OTU ID"},
-    };
+        // Create a layout object
+        let bubbleLayout = {
+            title: 'Bacteria Cultures Per Sample',
+            margin: {t: 50},
+            hovermode: 'closest',
+            xaxis: {title: "OTU ID"},
+        };
 
-    // Call Plotly funtion
-    Plotly.newPlot('bubble', bubbleArray, bubbleLayout);
-});
+        // Call Plotly funtion
+        Plotly.newPlot('bubble', bubbleArray, bubbleLayout);
+    });
+};
+
 
 // Metadata
-console.log(`Display sample metadata for 940`);
+function DisplayMetadata(sampleID) {
+    console.log(`Display sample metadata for ${sampleID}`);
 
-d3.json(url).then(data => {
-    let metadata=data.metadata;
-    console.log(metadata);
+    d3.json(url).then(data => {
+        let metadata=data.metadata;
+        console.log(metadata);
 
-    let result = metadata.filter(meta => meta.id == 950)[0];
-    let demog = d3.select('.panel-body');
+        let result = metadata.filter(meta => meta.id == 950)[0];
+        let demog = d3.select('.panel-body');
 
-    // demog.html('');
+        // demog.html('');
 
-    Object.entries(result).forEach(([key,value]) => {
-        demog.append('h6').text(`${key}: ${value}`);
+        Object.entries(result).forEach(([key,value]) => {
+            demog.append('h6').text(`${key}: ${value}`);
+        });
     });
+};
 
-})
+function IDchosen(sampleID) {
+    console.log(`Another ID chosen, new ID is ${sampleID}`);
+
+    GraphBar(sampleID);
+    GraphBubble(sampleID);
+    DisplayMetadata(sampleID);
+}
+
+function init() {
+    console.log('Initiate page');
+
+    // Use d3 library to select dropdown
+    let selector = d3.select('#selDataset');
+
+    d3.json(url).then(data => {
+        console.log('Data: ');
+
+        let sampleNames = data.names;
+        console.log('Sample names:', sampleNames);
+
+        // Populate the dropdown
+        for (let i = 0; i < sampleNames.length; i++) {
+            let sampleId = sampleNames[i];
+            selector.append('option').text(sampleId).property('value', sampleID);
+        };
+
+        let startID = 940;
+        console.log(`initialId = ${startID}`);
+
+        // Draw the bargraph for the selected sample id
+        GraphBar(startID);
+
+        // Draw the bubblechart for the selected sample id
+        GraphBubble(startID);
+
+        // Show the metadata for the selected sample id
+        DisplayMetadata(startID);
+
+    });
+};
+
+init();
 
