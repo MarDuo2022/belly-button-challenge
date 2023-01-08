@@ -10,8 +10,8 @@ console.log("Data Promise: ", dataPromise);
 
 // fetch JSON data has to be done together with plot 
 // Graph BAR
-GraphBar(sampleID) {
-d3.json(url).then(function(data) {
+function GraphBar(sampleID) {
+    d3.json(url).then(function(data) {
     console.log(data)
 
     let samples = data.samples;
@@ -98,7 +98,7 @@ function DisplayMetadata(sampleID) {
         let result = metadata.filter(meta => meta.id == 950)[0];
         let demog = d3.select('.panel-body');
 
-        // demog.html('');
+        demog.html('');
 
         Object.entries(result).forEach(([key,value]) => {
             demog.append('h6').text(`${key}: ${value}`);
@@ -121,31 +121,32 @@ function init() {
     let selector = d3.select('#selDataset');
 
     d3.json(url).then(data => {
-        console.log('Data: ');
+        console.log('Here is the data');
 
         let sampleNames = data.names;
-        console.log('Sample names:', sampleNames);
+        console.log('Here are the sample names:', sampleNames);
 
         // Populate the dropdown
         for (let i = 0; i < sampleNames.length; i++) {
             let sampleId = sampleNames[i];
-            selector.append('option').text(sampleId).property('value', sampleID);
+            selector.append('option').text(sampleId).property('value', sampleId);
         };
 
-        let startID = 940;
-        console.log(`initialId = ${startID}`);
+        // Read the current value from the dropdown
+        let initialId = selector.property('value');
+        console.log(`initialId = ${initialId}`);
 
         // Draw the bargraph for the selected sample id
-        GraphBar(startID);
+        GraphBar(initialId);
 
         // Draw the bubblechart for the selected sample id
-        GraphBubble(startID);
+        GraphBubble(initialId);
 
         // Show the metadata for the selected sample id
-        DisplayMetadata(startID);
+        DisplayMetadata(initialId);
 
     });
-};
+}
 
 init();
 
