@@ -80,3 +80,22 @@ d3.json(url).then(data => {
     // Call Plotly funtion
     Plotly.newPlot('bubble', bubbleArray, bubbleLayout);
 });
+
+// Metadata
+console.log(`Display sample metadata for 940`);
+
+d3.json(url).then(data => {
+    let metadata=data.metadata;
+    console.log(metadata);
+
+    let result = metadata.filter(meta => meta.id == 950)[0];
+    let demog = d3.select('.panel-body');
+
+    // demog.html('');
+
+    Object.entries(result).forEach(([key,value]) => {
+        demog.append('h6').text(`${key}: ${value}`);
+    });
+
+})
+
