@@ -1,10 +1,8 @@
 // 1. Use the D3 library to read in samples.json from the URL
-
 const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
 
 // fetch JSON data has to be done together with plot 
 // 2. Create a horizontal bar chart with a dropdown menu to display the top 10 OTUs found in that individual.
-
 function GraphBar(sampleID) {
     d3.json(url).then(function(data) {
     console.log(data)
@@ -17,14 +15,12 @@ function GraphBar(sampleID) {
     let otu_labels = samplesProperties.otu_labels;
     let sample_values = samplesProperties.sample_values;
 
-    let yvalues = otu_ids.slice(0,10).map(otuId => `OTU ${otuId}`).reverse();
-
     // Collate data for bar
     let barData = {
-        x: sample_values.slice(0,10).reverse(),
-        y: yvalues,
+        x: sample_values.sort(function(a, b){return b-a}).slice(0,10).reverse(),
+        y: otu_ids.slice(0,10).map(otuId => `OTU ${otuId}`).reverse(),
         type: 'bar',
-        text: otu_labels.slice(0,10).reverse(),
+        text: otu_labels.sort(function(a, b){return b-a}).slice(0,10).reverse(),
         orientation: 'h'
     };
 
@@ -40,6 +36,12 @@ function GraphBar(sampleID) {
 };
 
 // 3.Create a bubble chart that displays each sample.
+  // 1. Use otu_ids for the x values.
+  // 2. Use sample_values for the y values.
+  // 3. Use sample_values for the marker size.
+  // 4. Use otu_ids for the marker colors.
+  // 5. Use otu_labels for the text values
+
 function GraphBubble(sampleID) {
     console.log(`Generate bubble chart for ${sampleID}`);
 
@@ -52,7 +54,7 @@ function GraphBubble(sampleID) {
         let otu_labels = result.otu_labels;
         let sample_values = result.sample_values;
 
-        // Compile bubble data trace for chart
+        // Create the trace for the bubble chart
         let bubbleData = {
             x: otu_ids,
             y: sample_values,
@@ -68,12 +70,16 @@ function GraphBubble(sampleID) {
         // Put the trace into an array
         let bubbleArray = [bubbleData];
 
-        // Create a layout object
+        // Create layout for the bubble chart
         let bubbleLayout = {
-            title: 'Bacteria Cultures Per Sample',
-            margin: {t: 50},
+            title: '<b>Bubble Chart</b>',
+            automargin: true,
+            autosize: true,
+            showlegend: false,
             xaxis: {title: "OTU ID"},
         };
+
+        let config = {responsive:true}
 
         // Call Plotly funtion
         Plotly.newPlot('bubble', bubbleArray, bubbleLayout);
@@ -93,7 +99,7 @@ function DisplayMetadata(sampleID) {
         let result = metadata.filter(meta => meta.id == sampleID)[0];
         let demog = d3.select('.panel-body');
 
-        // clear drop down panel
+        // Use `.html("") to clear any existing metadata
         demog.html('');
 
         // add corresponding key and value
@@ -110,13 +116,14 @@ function optionChanged(sampleID) {
     GraphBar(sampleID);
     GraphBubble(sampleID);
     DisplayMetadata(sampleID);
-}
+    MakeGauge(sampleID);
+};
+
 
 function init() {
     console.log('Start page');
 
-    // Use d3 library to select dropdown
-    let selector = d3.select('#selDataset');
+    let selector = d3.select('#selDataset');  //use d3 to select dropdown menu
 
     d3.json(url).then(data => {
         console.log('Data: ');
@@ -130,8 +137,8 @@ function init() {
             selector.append('option').text(sampleID).property('value', sampleID);
         };
 
-        // Read the current value from the dropdown
-        let startID = selector.property('value');
+        // Load page with startID
+        let startID = selector.property('value'); //set startID as current dropdown menu's value
         console.log(`Starting ID = ${startID}`);
 
         // Draw the bargraph for the selected sample id
@@ -142,6 +149,9 @@ function init() {
 
         // Show the metadata for the selected sample id
         DisplayMetadata(startID);
+
+        // Show the metadata for the selected sample id
+        MakeGauge(startID);       
 
     });
 };
