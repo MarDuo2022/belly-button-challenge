@@ -45,12 +45,12 @@ function GraphBar(sampleID) {
 };
 
 // Graph Bubble chart
-function GraphBubble(sampleId) {
-    console.log(`Generate bubble chart for ${sampleId}`);
+function GraphBubble(sampleID) {
+    console.log(`Generate bubble chart for ${sampleID}`);
 
     d3.json(url).then(data => {
         let samples = data.samples;
-        let resultArray = samples.filter(sample => sample.id == sampleId);
+        let resultArray = samples.filter(sample => sample.id == sampleID);
         let result = resultArray[0];
 
         let otu_ids = result.otu_ids;
@@ -77,7 +77,6 @@ function GraphBubble(sampleId) {
         let bubbleLayout = {
             title: 'Bacteria Cultures Per Sample',
             margin: {t: 50},
-            hovermode: 'closest',
             xaxis: {title: "OTU ID"},
         };
 
@@ -95,7 +94,7 @@ function DisplayMetadata(sampleID) {
         let metadata=data.metadata;
         console.log(metadata);
 
-        let result = metadata.filter(meta => meta.id == 950)[0];
+        let result = metadata.filter(meta => meta.id == sampleID)[0];
         let demog = d3.select('.panel-body');
 
         demog.html('');
@@ -106,47 +105,48 @@ function DisplayMetadata(sampleID) {
     });
 };
 
-function IDchosen(sampleID) {
-    console.log(`Another ID chosen, new ID is ${sampleID}`);
+
+function optionChanged(sampleID) {
+    console.log(`ID has changed to: ${sampleID}`);
 
     GraphBar(sampleID);
     GraphBubble(sampleID);
+    // DrawGauge(sampleID);
     DisplayMetadata(sampleID);
 }
 
 function init() {
-    console.log('Initiate page');
+    console.log('Start page');
 
     // Use d3 library to select dropdown
     let selector = d3.select('#selDataset');
 
     d3.json(url).then(data => {
-        console.log('Here is the data');
+        console.log('Data: ');
 
         let sampleNames = data.names;
-        console.log('Here are the sample names:', sampleNames);
+        console.log('Sample names:', sampleNames);
 
         // Populate the dropdown
         for (let i = 0; i < sampleNames.length; i++) {
-            let sampleId = sampleNames[i];
-            selector.append('option').text(sampleId).property('value', sampleId);
+            let sampleID = sampleNames[i];
+            selector.append('option').text(sampleID).property('value', sampleID);
         };
 
         // Read the current value from the dropdown
-        let initialId = selector.property('value');
-        console.log(`initialId = ${initialId}`);
+        let startID = selector.property('value');
+        console.log(`Starting ID = ${startID}`);
 
         // Draw the bargraph for the selected sample id
-        GraphBar(initialId);
+        GraphBar(startID);
 
         // Draw the bubblechart for the selected sample id
-        GraphBubble(initialId);
+        GraphBubble(startID);
 
         // Show the metadata for the selected sample id
-        DisplayMetadata(initialId);
+        DisplayMetadata(startID);
 
     });
-}
+};
 
 init();
-
